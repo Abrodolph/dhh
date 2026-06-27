@@ -121,8 +121,8 @@ export default function Home() {
   return (
     <>
       <CollageBackground strength={0.14} />
-      <main className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col px-4 pb-16 pt-8">
-      <header className="self-center rounded-2xl bg-ink/85 px-6 py-5 text-center shadow-xl shadow-black/40 backdrop-blur-sm">
+      <main className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col bg-ink/85 px-5 pb-16 pt-8 shadow-2xl shadow-black/50 backdrop-blur-sm md:border-x md:border-paper/10">
+      <header className="text-center">
         <h1 className="font-condensed text-6xl font-bold tracking-tight text-paper">Brrr</h1>
         <p className="mt-1 font-condensed text-sm uppercase tracking-wide text-smoke">
           Guess the track from 1 second. {MAX_ATTEMPTS} attempts.
@@ -205,10 +205,8 @@ export default function Home() {
         <p className="mt-16 text-center text-smoke animate-pulse">Loading…</p>
       )}
 
-      <footer className="mt-auto pt-12 text-center">
-        <span className="inline-block rounded bg-ink/80 px-3 py-1.5 text-xs text-smoke/70 backdrop-blur-sm">
-          A fan project. All music belongs to the artists & labels — go stream the full songs.
-        </span>
+      <footer className="mt-auto pt-12 text-center text-xs text-smoke/60">
+        A fan project. All music belongs to the artists & labels — go stream the full songs.
       </footer>
       </main>
     </>

@@ -153,10 +153,8 @@ export default function Player({ clipUrl, unlocked, revealed }: Props) {
       </div>
 
       <div className="mt-2 flex justify-between font-condensed text-xs uppercase tracking-wider text-smoke tabular-nums">
-        <span className="rounded bg-ink/80 px-1.5 py-0.5 backdrop-blur-sm">
-          {head.toFixed(1)}s
-        </span>
-        <span className="rounded bg-ink/80 px-1.5 py-0.5 backdrop-blur-sm">
+        <span>{head.toFixed(1)}s</span>
+        <span>
           {limit}s unlocked{revealed ? "" : ` / ${TOTAL}`}
         </span>
       </div>
