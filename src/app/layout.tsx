@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Tiro_Devanagari_Hindi, Saira_Condensed } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const grotesk = Space_Grotesk({
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${grotesk.variable} ${devanagari.variable} ${condensed.variable}`}>
       <body className="bg-ink text-paper font-sans antialiased min-h-screen">
         {children}
+        <Analytics />
       </body>
     </html>
   );
