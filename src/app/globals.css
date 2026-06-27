@@ -9,7 +9,7 @@
 /* paper-grain texture, very subtle */
 body {
   background-image: radial-gradient(
-    rgba(242, 237, 227, 0.04) 1px,
+    rgba(242, 241, 238, 0.035) 1px,
     transparent 1px
   );
   background-size: 5px 5px;
@@ -24,7 +24,35 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .row-in {
+    animation: row-in 260ms ease-out both;
+  }
+  .play-pulse {
+    animation: play-pulse 1.6s ease-in-out infinite;
+  }
+}
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes play-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(198, 251, 69, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(198, 251, 69, 0.55);
+  }
+}
+
 :focus-visible {
-  outline: 2px solid #e9a23b;
+  outline: 2px solid #c6fb45;
   outline-offset: 2px;
 }

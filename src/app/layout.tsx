@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Tiro_Devanagari_Hindi } from "next/font/google";
+import { Space_Grotesk, Tiro_Devanagari_Hindi, Saira_Condensed } from "next/font/google";
 import "./globals.css";
 
 const grotesk = Space_Grotesk({
@@ -13,15 +13,23 @@ const devanagari = Tiro_Devanagari_Hindi({
   variable: "--font-devanagari",
 });
 
+// Bold condensed sans for display labels (Latin). The पहचान wordmark stays in
+// its Devanagari face — condensed Latin doesn't apply to Devanagari glyphs.
+const condensed = Saira_Condensed({
+  weight: ["600", "700"],
+  subsets: ["latin"],
+  variable: "--font-condensed",
+});
+
 export const metadata: Metadata = {
-  title: "Pehchaan — DHH Heardle",
+  title: "Brrr — DHH Heardle",
   description:
     "Hear 1 second of a Seedhe Maut track. Guess the song in 5 tries. New track daily.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${grotesk.variable} ${devanagari.variable}`}>
+    <html lang="en" className={`${grotesk.variable} ${devanagari.variable} ${condensed.variable}`}>
       <body className="bg-ink text-paper font-sans antialiased min-h-screen">
         {children}
       </body>

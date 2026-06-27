@@ -5,6 +5,7 @@ import Player from "@/components/Player";
 import GuessInput from "@/components/GuessInput";
 import AttemptRow from "@/components/AttemptRow";
 import ResultCard from "@/components/ResultCard";
+import CollageBackground from "@/components/CollageBackground";
 import {
   DURATIONS,
   MAX_ATTEMPTS,
@@ -118,10 +119,12 @@ export default function Home() {
   const gameOver = status !== "playing";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col px-4 pb-16 pt-8">
-      <header className="text-center">
-        <h1 className="font-display text-5xl text-paper">पहचान</h1>
-        <p className="mt-1 text-sm text-smoke">
+    <>
+      <CollageBackground strength={0.14} />
+      <main className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col px-4 pb-16 pt-8">
+      <header className="self-center rounded-2xl bg-ink/85 px-6 py-5 text-center shadow-xl shadow-black/40 backdrop-blur-sm">
+        <h1 className="font-condensed text-6xl font-bold tracking-tight text-paper">Brrr</h1>
+        <p className="mt-1 font-condensed text-sm uppercase tracking-wide text-smoke">
           Guess the track from 1 second. {MAX_ATTEMPTS} attempts.
         </p>
         <div className="mt-4 flex justify-center gap-2 text-xs">
@@ -129,9 +132,9 @@ export default function Home() {
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`rounded-sm border px-3 py-1.5 ${
+              className={`rounded-sm border px-3 py-1.5 font-condensed uppercase tracking-wider ${
                 mode === m
-                  ? "border-amber text-amber"
+                  ? "border-accent text-accent"
                   : "border-paper/15 text-smoke hover:text-paper"
               }`}
             >
@@ -186,9 +189,9 @@ export default function Home() {
                   {mode === "random" && (
                     <button
                       onClick={() => void loadPuzzle("random")}
-                      className="rounded-sm border border-paper/25 py-2.5 text-paper hover:border-amber hover:text-amber"
+                      className="rounded-sm border border-paper/25 py-2.5 text-paper hover:border-accent hover:text-accent"
                     >
-                      Ek aur →
+                      Another one →
                     </button>
                   )}
                 </div>
@@ -202,9 +205,12 @@ export default function Home() {
         <p className="mt-16 text-center text-smoke animate-pulse">Loading…</p>
       )}
 
-      <footer className="mt-auto pt-12 text-center text-xs text-smoke/60">
-        A fan project. All music belongs to the artists & labels — go stream the full songs.
+      <footer className="mt-auto pt-12 text-center">
+        <span className="inline-block rounded bg-ink/80 px-3 py-1.5 text-xs text-smoke/70 backdrop-blur-sm">
+          A fan project. All music belongs to the artists & labels — go stream the full songs.
+        </span>
       </footer>
-    </main>
+      </main>
+    </>
   );
 }

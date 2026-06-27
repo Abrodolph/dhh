@@ -22,7 +22,7 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
   const [copied, setCopied] = useState(false);
 
   const shareText = [
-    `Pehchaan${puzzleNumber ? ` #${puzzleNumber}` : ""}`,
+    `Brrr${puzzleNumber ? ` #${puzzleNumber}` : ""}`,
     emojiGrid(attempts),
     typeof window !== "undefined" ? window.location.origin : "",
   ].join("\n");
@@ -44,9 +44,9 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
   return (
     <div className="rounded-sm border border-paper/20 bg-paper/5 p-5 text-center">
       <p className="text-sm text-smoke">
-        {status === "won" ? "Pehchaan liya! 🔥" : "Agli baar pakka."}
+        {status === "won" ? "Got it! 🔥" : "Next time for sure."}
       </p>
-      <h2 className="mt-1 text-2xl font-medium">{answer.title}</h2>
+      <h2 className="mt-1 font-condensed text-3xl font-bold uppercase tracking-wide">{answer.title}</h2>
       <p className="text-smoke">
         {answer.artist}
         {answer.album ? ` · ${answer.album}` : ""}
@@ -67,9 +67,9 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
           href={`https://open.spotify.com/search/${query}`}
           target="_blank"
           rel="noreferrer"
-          className="rounded-sm border border-paper/25 px-6 py-2.5 text-paper hover:border-amber hover:text-amber"
+          className="rounded-sm border border-paper/25 px-6 py-2.5 text-paper hover:border-accent hover:text-accent"
         >
-          Full song sun →
+          Listen to full song →
         </a>
       </div>
     </div>

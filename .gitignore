@@ -4,3 +4,4 @@ node_modules
 .env
 clips/
 manifest.csv
+tsconfig.tsbuildinfo

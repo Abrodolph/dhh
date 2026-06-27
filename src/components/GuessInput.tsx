@@ -73,8 +73,8 @@ export default function GuessInput({ songs, disabled, onGuess, onSkip, skipLabel
               setOpen(false);
             }
           }}
-          placeholder="Kaunsa gaana hai? Type to search…"
-          className="w-full rounded-sm border border-paper/20 bg-ink px-4 py-3 text-paper placeholder-smoke focus:border-amber disabled:opacity-40"
+          placeholder="Which song is it? Type to search…"
+          className="w-full rounded-sm border border-accent bg-ink px-4 py-3 text-paper placeholder-smoke focus:border-accent focus:shadow-[0_0_12px_rgba(198,251,69,0.25)] disabled:opacity-40"
           autoComplete="off"
           spellCheck={false}
           aria-label="Guess the song"

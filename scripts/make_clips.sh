@@ -15,7 +15,12 @@ tail -n +2 "$IN" | while IFS=, read -r src title album year diff start; do
     -ac 1 -b:a 96k \
     -af "afade=t=in:d=0.05,afade=t=out:st=15.7:d=0.3" \
     "clips/${id}.mp3"
-  echo "${id},\"${title}\",\"${ARTIST}\",\"${album}\",${year},${diff},clips/${id}.mp3" >> manifest.csv
+  # clip_path is the R2 object key. Files are uploaded to the bucket ROOT,
+  # so the key is just "<id>.mp3" (no "clips/" prefix). R2_PUBLIC_BASE_URL +
+  # "/" + clip_path must resolve to a real object.
+  echo "${id},\"${title}\",\"${ARTIST}\",\"${album}\",${year},${diff},${id}.mp3" >> manifest.csv
   echo "OK ${title}"
 done
-echo "Done. Upload clips/ to R2, then: python scripts/manifest-to-sql.py manifest.csv > seed.sql"
+echo "Done. Upload the CONTENTS of clips/ to the R2 bucket root"
+echo "(e.g. rclone copy clips/ r2:pehchaan-clips/), then:"
+echo "  python scripts/manifest-to-sql.py manifest.csv > seed.sql"
