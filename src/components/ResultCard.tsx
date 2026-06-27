@@ -22,7 +22,7 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
   const [copied, setCopied] = useState(false);
 
   const shareText = [
-    `Brrr${puzzleNumber ? ` #${puzzleNumber}` : ""}`,
+    `DHH Heardle${puzzleNumber ? ` #${puzzleNumber}` : ""}`,
     emojiGrid(attempts),
     typeof window !== "undefined" ? window.location.origin : "",
   ].join("\n");

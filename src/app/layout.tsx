@@ -14,8 +14,7 @@ const devanagari = Tiro_Devanagari_Hindi({
   variable: "--font-devanagari",
 });
 
-// Bold condensed sans for display labels (Latin). The पहचान wordmark stays in
-// its Devanagari face — condensed Latin doesn't apply to Devanagari glyphs.
+// Bold condensed sans for the wordmark + display labels.
 const condensed = Saira_Condensed({
   weight: ["600", "700"],
   subsets: ["latin"],
@@ -23,7 +22,7 @@ const condensed = Saira_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "Brrr — DHH Heardle",
+  title: "DHH Heardle",
   description:
     "Hear 1 second of a Seedhe Maut track. Guess the song in 5 tries. New track daily.",
 };

@@ -123,7 +123,7 @@ export default function Home() {
       <CollageBackground strength={0.14} />
       <main className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col bg-ink/85 px-5 pb-16 pt-8 shadow-2xl shadow-black/50 backdrop-blur-sm md:border-x md:border-paper/10">
       <header className="text-center">
-        <h1 className="font-condensed text-6xl font-bold tracking-tight text-paper">Brrr</h1>
+        <h1 className="font-condensed text-5xl font-bold uppercase tracking-tight text-paper">DHH Heardle</h1>
         <p className="mt-1 font-condensed text-sm uppercase tracking-wide text-smoke">
           Guess the track from 1 second. {MAX_ATTEMPTS} attempts.
         </p>
