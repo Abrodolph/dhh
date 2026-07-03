@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolvePuzzle, supabaseAdmin } from "@/lib/server";
+import { resolvePuzzle, supabaseAdmin, makeWinProof } from "@/lib/server";
 import { MAX_ATTEMPTS } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +44,8 @@ export async function POST(req: NextRequest) {
       correct,
       artistMatch,
       ...(reveal && { answer: pub(answer) }),
+      // Signed proof for round scoring — only when the guess is actually right.
+      ...(correct && { proof: makeWinProof(answer.id, attempt) }),
     });
   } catch (e) {
     console.error(e);
@@ -51,6 +53,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function pub(s: { title: string; artist: string; album: string | null }) {
-  return { title: s.title, artist: s.artist, album: s.album };
+function pub(s: {
+  title: string;
+  artist: string;
+  album: string | null;
+  cover_url: string | null;
+}) {
+  return { title: s.title, artist: s.artist, album: s.album, coverUrl: s.cover_url };
 }

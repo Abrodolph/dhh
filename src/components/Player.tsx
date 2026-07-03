@@ -98,23 +98,21 @@ export default function Player({ clipUrl, unlocked, revealed }: Props) {
     const a = audioRef.current;
     if (!a) return;
     setAudioError(null);
-    const start = () => {
-      a.currentTime = 0;
-      a.play()
-        .then(() => {
-          setPlaying(true);
-          rafRef.current = requestAnimationFrame(tick);
-        })
-        .catch((err) => {
-          setAudioError(`Playback blocked: ${err?.message ?? err}`);
-          // eslint-disable-next-line no-console
-          console.error("[Player] play() rejected", err);
-          setPlaying(false);
-        });
-    };
-    // If metadata isn't loaded yet, seeking to 0 can be ignored; wait for it.
-    if (a.readyState >= 1) start();
-    else a.addEventListener("loadedmetadata", start, { once: true });
+    // play() MUST be called synchronously in the tap's call stack — iOS Safari
+    // rejects playback started from a later async callback (e.g. waiting for
+    // loadedmetadata). The promise itself resolving after buffering is fine.
+    if (a.readyState >= 1) a.currentTime = 0; // reset replays; a fresh clip is at 0 anyway
+    a.play()
+      .then(() => {
+        setPlaying(true);
+        rafRef.current = requestAnimationFrame(tick);
+      })
+      .catch((err) => {
+        setAudioError(`Playback blocked: ${err?.message ?? err}`);
+        // eslint-disable-next-line no-console
+        console.error("[Player] play() rejected", err);
+        setPlaying(false);
+      });
   }
 
   return (

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import type { AttemptResult } from "@/lib/types";
+import type { AttemptResult, RevealAnswer } from "@/lib/types";
 import { artistLabel } from "@/lib/artists";
+import CoverBackdrop from "./CoverBackdrop";
 
 type Props = {
   status: "won" | "lost";
-  answer: { title: string; artist: string; album: string | null };
+  answer: RevealAnswer;
   attempts: AttemptResult[];
   puzzleNumber: number | null;
 };
@@ -43,7 +44,9 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
   const query = encodeURIComponent(`${artistLabel(answer.artist)} ${answer.title}`);
 
   return (
-    <div className="rounded-sm border border-paper/20 bg-paper/5 p-5 text-center">
+    <div className="relative overflow-hidden rounded-sm border border-paper/20 bg-paper/5 p-5 text-center">
+      <CoverBackdrop coverUrl={answer.coverUrl} />
+      <div className="relative">
       <p className="text-sm text-smoke">
         {status === "won" ? "Got it! 🔥" : "Next time for sure."}
       </p>
@@ -72,6 +75,7 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
         >
           Listen to full song →
         </a>
+      </div>
       </div>
     </div>
   );

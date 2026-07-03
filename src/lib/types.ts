@@ -20,10 +20,52 @@ export type GuessRequest = {
   attempt: number; // 1-indexed
 };
 
+/** The song, revealed only when the game ends (correct or out of attempts).
+ * `coverUrl` is gated the same way — it never reaches the client mid-game. */
+export type RevealAnswer = {
+  title: string;
+  artist: string;
+  album: string | null;
+  coverUrl?: string | null;
+};
+
 export type GuessResponse = {
   correct: boolean;
   artistMatch: boolean;
-  answer?: { title: string; artist: string; album: string | null };
+  answer?: RevealAnswer;
+  /** Signed proof, present only when `correct`. Binds songId + attempt so the
+   * round score can't be forged when submitted to /api/score. */
+  proof?: string;
+};
+
+// ---- Round mode ---------------------------------------------------------
+
+/** One song's outcome within a round, kept client-side and posted to /api/score. */
+export type RoundSongResult = {
+  puzzleId: string;
+  attempt: number; // 1-indexed correct attempt, or MAX_ATTEMPTS if never got it
+  correct: boolean;
+  proof: string | null; // signed win proof from /api/guess (null if wrong)
+  answer: RevealAnswer;
+  attempts: AttemptResult[]; // for the emoji grid
+};
+
+/** What /api/score returns after verifying + recomputing the round. */
+export type ScoreResult = {
+  score: number;
+  songsCorrect: number;
+  songsTotal: number;
+  breakdown: { correct: boolean; attempt: number; difficulty: number; points: number }[];
+};
+
+export type LeaderboardEntry = {
+  rank: number;
+  playerId: string;
+  username: string | null;
+  score: number;
+  songsCorrect: number;
+  secondsUsed: number;
+  createdAt: string;
 };
 
 export type AttemptResult =

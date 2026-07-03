@@ -18,7 +18,7 @@ type Props = {
 };
 
 export default function PracticeFilters({ artists, prefs, onChange }: Props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const allArtists = prefs.artists.length === 0;
 
   function toggleArtist(a: string) {
@@ -34,7 +34,7 @@ export default function PracticeFilters({ artists, prefs, onChange }: Props) {
 
   return (
     <div className="rounded-sm border border-paper/15 bg-paper/[0.03] p-4">
-      {/* Artists: collapsed by default so the list stays short as we add more artists.
+      {/* Artists: expanded by default; collapsible via the header for a shorter view.
           The header carries the current selection count. */}
       <button
         onClick={() => setOpen((o) => !o)}

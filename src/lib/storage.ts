@@ -1,4 +1,4 @@
-import type { Stats } from "./types";
+import type { Stats, RevealAnswer } from "./types";
 
 const KEY = "pehchaan:stats:v1";
 
@@ -50,7 +50,7 @@ export type SavedGame = {
   date: string;
   attempts: unknown[];
   status: "playing" | "won" | "lost";
-  answer?: { title: string; artist: string; album: string | null };
+  answer?: RevealAnswer;
 };
 
 export function saveGame(g: SavedGame) {
