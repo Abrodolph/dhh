@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import type { SongOption } from "@/lib/types";
+import { artistLabel } from "@/lib/artists";
 
 type Props = {
   songs: SongOption[];
@@ -74,7 +75,7 @@ export default function GuessInput({ songs, disabled, onGuess, onSkip, skipLabel
             }
           }}
           placeholder="Which song is it? Type to search…"
-          className="w-full rounded-sm border border-accent bg-ink px-4 py-3 text-paper placeholder-smoke focus:border-accent focus:shadow-[0_0_12px_rgba(198,251,69,0.25)] disabled:opacity-40"
+          className="w-full min-h-[52px] rounded-sm border border-accent bg-ink px-4 py-3.5 text-base text-paper placeholder-smoke focus:border-accent focus:shadow-[0_0_12px_rgba(198,251,69,0.25)] disabled:opacity-40"
           autoComplete="off"
           spellCheck={false}
           aria-label="Guess the song"
@@ -84,14 +85,14 @@ export default function GuessInput({ songs, disabled, onGuess, onSkip, skipLabel
             {matches.map((m, i) => (
               <li key={m.id}>
                 <button
-                  className={`w-full px-4 py-2.5 text-left ${
+                  className={`w-full min-h-[48px] px-4 py-3.5 text-left ${
                     i === highlight ? "bg-paper/10" : ""
                   }`}
                   onMouseEnter={() => setHighlight(i)}
                   onClick={() => choose(m)}
                 >
                   <span className="text-paper">{m.title}</span>
-                  <span className="ml-2 text-xs text-smoke">{m.artist}</span>
+                  <span className="ml-2 text-xs text-smoke">{artistLabel(m.artist)}</span>
                 </button>
               </li>
             ))}
@@ -102,7 +103,7 @@ export default function GuessInput({ songs, disabled, onGuess, onSkip, skipLabel
       <button
         onClick={onSkip}
         disabled={disabled}
-        className="mt-3 w-full rounded-sm border border-paper/20 py-2.5 text-sm text-smoke hover:border-smoke hover:text-paper transition-colors disabled:opacity-40"
+        className="mt-3 min-h-[56px] w-full rounded-sm border border-paper/20 py-4 text-base text-smoke hover:border-smoke hover:text-paper transition-colors disabled:opacity-40"
       >
         {skipLabel}
       </button>

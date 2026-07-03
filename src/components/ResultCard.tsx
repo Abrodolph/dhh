@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { AttemptResult } from "@/lib/types";
+import { artistLabel } from "@/lib/artists";
 
 type Props = {
   status: "won" | "lost";
@@ -39,7 +40,7 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
     } catch {}
   }
 
-  const query = encodeURIComponent(`${answer.artist} ${answer.title}`);
+  const query = encodeURIComponent(`${artistLabel(answer.artist)} ${answer.title}`);
 
   return (
     <div className="rounded-sm border border-paper/20 bg-paper/5 p-5 text-center">
@@ -48,7 +49,7 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
       </p>
       <h2 className="mt-1 font-condensed text-3xl font-bold uppercase tracking-wide">{answer.title}</h2>
       <p className="text-smoke">
-        {answer.artist}
+        {artistLabel(answer.artist)}
         {answer.album ? ` · ${answer.album}` : ""}
       </p>
 
@@ -56,10 +57,10 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
         {emojiGrid(attempts)}
       </div>
 
-      <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <button
           onClick={share}
-          className="rounded-sm bg-sindoor px-6 py-2.5 font-medium text-paper hover:opacity-90"
+          className="min-h-[52px] rounded-sm bg-sindoor px-6 py-3.5 text-base font-medium text-paper hover:opacity-90"
         >
           {copied ? "Copied!" : "Share result"}
         </button>
@@ -67,7 +68,7 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
           href={`https://open.spotify.com/search/${query}`}
           target="_blank"
           rel="noreferrer"
-          className="rounded-sm border border-paper/25 px-6 py-2.5 text-paper hover:border-accent hover:text-accent"
+          className="flex min-h-[52px] items-center justify-center rounded-sm border border-paper/25 px-6 py-3.5 text-base text-paper hover:border-accent hover:text-accent"
         >
           Listen to full song →
         </a>

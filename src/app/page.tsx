@@ -6,6 +6,9 @@ import GuessInput from "@/components/GuessInput";
 import AttemptRow from "@/components/AttemptRow";
 import ResultCard from "@/components/ResultCard";
 import CollageBackground from "@/components/CollageBackground";
+import StatsModal from "@/components/StatsModal";
+import Countdown from "@/components/Countdown";
+import PracticeFilters from "@/components/PracticeFilters";
 import {
   DURATIONS,
   MAX_ATTEMPTS,
@@ -16,6 +19,13 @@ import {
   type SongOption,
 } from "@/lib/types";
 import { loadGame, recordDailyResult, saveGame } from "@/lib/storage";
+import { getPlayerId } from "@/lib/identity";
+import {
+  loadPracticePrefs,
+  savePracticePrefs,
+  DIFFICULTY_TO_NUM,
+  type PracticePrefs,
+} from "@/lib/practicePrefs";
 
 type Mode = "daily" | "random";
 
@@ -28,24 +38,46 @@ export default function Home() {
   const [answer, setAnswer] = useState<{ title: string; artist: string; album: string | null } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
+  const [empty, setEmpty] = useState(false);
+  const [artists, setArtists] = useState<string[]>([]);
+  const [prefs, setPrefs] = useState<PracticePrefs>({ artists: [], difficulty: "mixed" });
 
   const attemptNo = attempts.length + 1;
   const unlocked = DURATIONS[Math.min(attempts.length, MAX_ATTEMPTS - 1)];
 
-  const loadPuzzle = useCallback(async (m: Mode) => {
+  const loadPuzzle = useCallback(async (m: Mode, prefsOverride?: PracticePrefs) => {
     setError(null);
+    setEmpty(false);
     setPuzzle(null);
     setAttempts([]);
     setStatus("playing");
     setAnswer(null);
     try {
-      const res = await fetch(`/api/puzzle?mode=${m}`);
+      // Daily: unchanged global endpoint / shared puzzle-fetch.
+      // Practice: separate filtered endpoint, no daily-pick involvement.
+      let url = "/api/puzzle?mode=daily";
+      if (m === "random") {
+        const p = prefsOverride ?? loadPracticePrefs();
+        const qs = new URLSearchParams();
+        if (p.artists.length) qs.set("artists", p.artists.join(","));
+        if (p.difficulty !== "mixed") qs.set("difficulty", String(DIFFICULTY_TO_NUM[p.difficulty]));
+        url = `/api/practice${qs.toString() ? `?${qs.toString()}` : ""}`;
+      }
+
+      const res = await fetch(url);
       if (!res.ok) throw new Error();
-      const p = (await res.json()) as Puzzle;
-      setPuzzle(p);
+      const data = (await res.json()) as Puzzle & { empty?: boolean };
+
+      if (m === "random" && data.empty) {
+        setEmpty(true);
+        return;
+      }
+
+      setPuzzle(data);
       // restore in-progress / finished daily game
       if (m === "daily") {
-        const date = p.puzzleId.slice(6);
+        const date = data.puzzleId.slice(6);
         const saved = loadGame(date);
         if (saved) {
           setAttempts(saved.attempts as AttemptResult[]);
@@ -54,7 +86,7 @@ export default function Home() {
         }
       }
     } catch {
-      setError("Couldn't load today's puzzle. Database empty or env vars missing?");
+      setError("Couldn't load the puzzle. Database empty or env vars missing?");
     }
   }, []);
 
@@ -67,6 +99,33 @@ export default function Home() {
       .then((r) => r.json())
       .then((d) => Array.isArray(d) && setSongs(d))
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setPrefs(loadPracticePrefs());
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/artists")
+      .then((r) => r.json())
+      .then((d) => Array.isArray(d) && setArtists(d))
+      .catch(() => {});
+  }, []);
+
+  // Register an anonymous player id once per session (fire-and-forget;
+  // never blocks gameplay).
+  useEffect(() => {
+    const id = getPlayerId();
+    if (!id) return;
+    try {
+      if (sessionStorage.getItem("hook_player_synced")) return;
+      sessionStorage.setItem("hook_player_synced", "1");
+    } catch {}
+    fetch("/api/player", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    }).catch(() => {});
   }, []);
 
   async function submit(song: SongOption | null) {
@@ -116,12 +175,23 @@ export default function Home() {
     }
   }
 
+  function updatePrefs(p: PracticePrefs) {
+    setPrefs(p);
+    savePracticePrefs(p);
+  }
+
   const gameOver = status !== "playing";
 
   return (
     <>
       <CollageBackground strength={0.14} />
       <main className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col bg-ink/85 px-5 pb-16 pt-8 shadow-2xl shadow-black/50 backdrop-blur-sm md:border-x md:border-paper/10">
+      <button
+        onClick={() => setStatsOpen(true)}
+        className="absolute right-4 top-4 min-h-[40px] rounded-sm border border-paper/15 px-3.5 py-2 font-condensed text-sm uppercase tracking-wider text-smoke hover:border-accent hover:text-accent"
+      >
+        Stats
+      </button>
       <header className="text-center">
         <h1 className="font-condensed text-5xl font-bold uppercase tracking-tight text-paper">DHH Heardle</h1>
         <p className="mt-1 font-condensed text-sm uppercase tracking-wide text-smoke">
@@ -132,7 +202,7 @@ export default function Home() {
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`rounded-sm border px-3 py-1.5 font-condensed uppercase tracking-wider ${
+              className={`min-h-[52px] rounded-sm border px-6 py-3.5 text-base font-condensed uppercase tracking-wider ${
                 mode === m
                   ? "border-accent text-accent"
                   : "border-paper/15 text-smoke hover:text-paper"
@@ -149,6 +219,24 @@ export default function Home() {
       {error && (
         <p className="mt-8 rounded-sm border border-sindoor/40 bg-sindoor/10 p-3 text-sm text-sindoor">
           {error}
+        </p>
+      )}
+
+      {mode === "random" && (
+        <section className="mt-8">
+          <PracticeFilters artists={artists} prefs={prefs} onChange={updatePrefs} />
+          <button
+            onClick={() => void loadPuzzle("random", prefs)}
+            className="mt-3 min-h-[58px] w-full rounded-sm border border-accent py-4 text-lg font-condensed uppercase tracking-wider text-accent hover:bg-accent/10"
+          >
+            New puzzle
+          </button>
+        </section>
+      )}
+
+      {empty && mode === "random" && (
+        <p className="mt-8 rounded-sm border border-amber/40 bg-amber/10 p-3 text-center text-sm text-amber">
+          No songs match — try widening your picks.
         </p>
       )}
 
@@ -186,14 +274,7 @@ export default function Home() {
                     attempts={attempts}
                     puzzleNumber={puzzle.puzzleNumber}
                   />
-                  {mode === "random" && (
-                    <button
-                      onClick={() => void loadPuzzle("random")}
-                      className="rounded-sm border border-paper/25 py-2.5 text-paper hover:border-accent hover:text-accent"
-                    >
-                      Another one →
-                    </button>
-                  )}
+                  {mode === "daily" && <Countdown />}
                 </div>
               )
             )}
@@ -201,7 +282,7 @@ export default function Home() {
         </>
       )}
 
-      {!puzzle && !error && (
+      {!puzzle && !empty && !error && (
         <p className="mt-16 text-center text-smoke animate-pulse">Loading…</p>
       )}
 
@@ -209,6 +290,7 @@ export default function Home() {
         A fan project. All music belongs to the artists & labels — go stream the full songs.
       </footer>
       </main>
+      <StatsModal open={statsOpen} onClose={() => setStatsOpen(false)} />
     </>
   );
 }

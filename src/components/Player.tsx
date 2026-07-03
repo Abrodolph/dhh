@@ -161,7 +161,7 @@ export default function Player({ clipUrl, unlocked, revealed }: Props) {
 
       <button
         onClick={playing ? stop : play}
-        className={`mt-4 mx-auto flex h-16 w-16 items-center justify-center rounded-full border-2 border-accent bg-accent text-ink text-2xl shadow-[0_0_14px_rgba(198,251,69,0.4)] hover:shadow-[0_0_24px_rgba(198,251,69,0.65)] transition-[box-shadow,border-color,color]${
+        className={`mt-4 mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-accent bg-accent text-ink text-3xl shadow-[0_0_14px_rgba(198,251,69,0.4)] hover:shadow-[0_0_24px_rgba(198,251,69,0.65)] transition-[box-shadow,border-color,color]${
           playing ? " play-pulse" : ""
         }`}
         aria-label={playing ? "Stop" : "Play"}
