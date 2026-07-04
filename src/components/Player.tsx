@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DURATIONS } from "@/lib/types";
 
 type Props = {
@@ -12,7 +12,20 @@ type Props = {
 };
 
 const TOTAL = DURATIONS[DURATIONS.length - 1]; // 16
-const BAR_COUNT = 56;
+
+// --- Cassette geometry (SVG user units, viewBox 340×210) ---
+const CH_X0 = 44; // exposed-tape strip: left edge
+const CH_W = 252; //                     width == the full 16s
+const CH_Y = 176; //                     top edge
+const CH_H = 14; //                      height
+const REEL_L = 118; // supply reel centre x
+const REEL_R = 222; // take-up reel centre x
+const REEL_CY = 118; // reel centre y
+const REEL_R_MAX = 37; // outer wound radius
+const REEL_HUB = 14; // hub radius
+const SHADOW = "#0E0B2A"; // near-black outline + hard offset shadow
+const TAPE = "#17123A"; // dark magnetic tape
+const xForT = (t: number) => CH_X0 + (t / TOTAL) * CH_W;
 
 export default function Player({ clipUrl, unlocked, revealed }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -26,23 +39,8 @@ export default function Player({ clipUrl, unlocked, revealed }: Props) {
   const limit = revealed ? TOTAL : unlocked;
 
   // The fill head: the live playhead while playing, otherwise the furthest
-  // point already heard (so the bar stays red after playback instead of black).
+  // point already heard (so the tape stays wound to that point when idle).
   const head = playing ? position : restPos;
-
-  // Synthesized waveform silhouette: deterministic bar heights (0.42–0.92) from
-  // layered sines, computed once. NOT real audio data — true FFT needs Web Audio
-  // analysis, which needs CORS on the R2 media (would break playback).
-  const bars = useMemo(
-    () =>
-      Array.from({ length: BAR_COUNT }, (_, i) => {
-        const v =
-          Math.sin(i * 0.7) * 0.5 +
-          Math.sin(i * 1.9 + 1.3) * 0.3 +
-          Math.sin(i * 0.3 + 0.6) * 0.2;
-        return 0.42 + (v * 0.5 + 0.5) * 0.5;
-      }),
-    [],
-  );
 
   useEffect(() => {
     setAudioError(null);
@@ -115,51 +113,138 @@ export default function Player({ clipUrl, unlocked, revealed }: Props) {
       });
   }
 
+  // Tape wound onto the take-up reel (0→1), shared by both reels + the strip.
+  const p = Math.max(0, Math.min(1, head / TOTAL));
+  const supplyWound = REEL_HUB + (1 - p) * (REEL_R_MAX - REEL_HUB); // left, empties
+  const takeupWound = REEL_HUB + p * (REEL_R_MAX - REEL_HUB); //       right, fills
+  const heardW = (Math.min(head, limit) / TOTAL) * CH_W;
+  const unlockedW = (limit / TOTAL) * CH_W;
+
+  // One reel: a wound ring of dark tape + a hub that spins only while playing.
+  const reel = (cx: number, woundR: number) => (
+    <g transform={`translate(${cx} ${REEL_CY})`}>
+      <circle r={REEL_R_MAX + 1} fill="none" stroke={SHADOW} strokeOpacity={0.4} strokeWidth={2} />
+      {woundR > REEL_HUB + 0.5 && (
+        <circle
+          r={(REEL_HUB + woundR) / 2}
+          fill="none"
+          stroke={TAPE}
+          strokeWidth={woundR - REEL_HUB}
+        />
+      )}
+      <circle r={woundR} fill="none" stroke="#FF3DA5" strokeOpacity={0.55} strokeWidth={1.5} />
+      <g
+        className={playing ? "reel-run" : undefined}
+        style={{ transformBox: "fill-box", transformOrigin: "center" }}
+      >
+        <circle r={REEL_HUB} fill="#F4EEDD" stroke={SHADOW} strokeWidth={2} />
+        {[0, 60, 120, 180, 240, 300].map((deg) => {
+          const a = (deg * Math.PI) / 180;
+          return (
+            <line
+              key={deg}
+              x1={Math.cos(a) * 4}
+              y1={Math.sin(a) * 4}
+              x2={Math.cos(a) * (REEL_HUB - 2)}
+              y2={Math.sin(a) * (REEL_HUB - 2)}
+              stroke={SHADOW}
+              strokeWidth={2}
+              strokeLinecap="round"
+            />
+          );
+        })}
+        <circle r={2.5} fill={SHADOW} />
+      </g>
+    </g>
+  );
+
   return (
     <div className="w-full">
-      {/* Live waveform: tall lime bars = heard/playing, dim short = locked.
-          Tier ticks mark the 1/2/4/8/16s unlock boundaries. */}
-      <div className="relative">
-        <div className="flex h-16 w-full items-center gap-[2px]" aria-hidden>
-          {bars.map((base, i) => {
-            const t = ((i + 0.5) / BAR_COUNT) * TOTAL; // bar's time, 0–16s
-            const locked = t > limit;
-            const heard = !locked && t <= head;
-            const isTip = playing && head >= t && head - t < TOTAL / BAR_COUNT;
-            const h = locked ? Math.max(0.12, base * 0.4) : heard ? base : base * 0.7;
-            return (
-              <div
-                key={i}
-                className={`min-w-0 flex-1 rounded-full transition-[height,background-color,box-shadow] duration-100 ease-linear ${
-                  heard ? "bg-accent" : locked ? "bg-paper/10" : "bg-paper/30"
-                } ${isTip ? "shadow-[0_0_10px_rgba(198,251,69,0.7)]" : ""}`}
-                style={{ height: `${h * 100}%` }}
-              />
-            );
-          })}
-        </div>
-        {DURATIONS.slice(0, -1).map((d) => (
-          <span
+      {/* The visualization IS a stylized cassette: two reels wind as audio plays,
+          and the exposed tape along the bottom is the proportional strip —
+          bright = heard, dim = unlocked, dark = still locked. Tier ticks mark
+          the 1/2/4/8s unlock boundaries. */}
+      <svg
+        viewBox="0 0 340 212"
+        className="mx-auto block w-full max-w-[280px]"
+        role="img"
+        aria-label={`Cassette: ${head.toFixed(1)} of ${limit} unlocked seconds heard`}
+      >
+        <defs>
+          <linearGradient id="riso" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#FF6A1A" />
+            <stop offset="0.5" stopColor="#FF3DA5" />
+            <stop offset="1" stopColor="#12C2E9" />
+          </linearGradient>
+          <pattern id="halftone" width="10" height="10" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1.3" fill="#12C2E9" opacity="0.13" />
+          </pattern>
+        </defs>
+
+        {/* Hard offset shadow, then the shell + halftone screen. */}
+        <rect x={12} y={12} width={322} height={192} rx={16} fill={SHADOW} />
+        <rect x={6} y={6} width={322} height={192} rx={16} fill="#2A2668" stroke={SHADOW} strokeWidth={4} />
+        <rect x={6} y={6} width={322} height={192} rx={16} fill="url(#halftone)" />
+
+        {/* Label strip. */}
+        <rect x={26} y={22} width={288} height={38} rx={6} fill="#1C1948" stroke={SHADOW} strokeWidth={2} />
+        <text
+          x={40}
+          y={46}
+          fontFamily="var(--font-mono), monospace"
+          fontSize={15}
+          fill="#F4EEDD"
+          letterSpacing={3}
+        >
+          SIDE A
+        </text>
+        <rect x={240} y={31} width={60} height={20} rx={3} fill="url(#riso)" stroke={SHADOW} strokeWidth={2} />
+
+        {/* Reel window + threaded tape down to the exposed strip. */}
+        <rect x={72} y={REEL_CY - 46} width={196} height={92} rx={12} fill={TAPE} fillOpacity={0.5} stroke={SHADOW} strokeWidth={2} />
+        <line x1={REEL_L} y1={REEL_CY + REEL_R_MAX} x2={CH_X0 + 8} y2={CH_Y} stroke={TAPE} strokeWidth={5} />
+        <line x1={REEL_R} y1={REEL_CY + REEL_R_MAX} x2={CH_X0 + CH_W - 8} y2={CH_Y} stroke={TAPE} strokeWidth={5} />
+        {reel(REEL_L, supplyWound)}
+        {reel(REEL_R, takeupWound)}
+
+        {/* Exposed tape = the proportional strip. */}
+        <rect x={CH_X0} y={CH_Y} width={CH_W} height={CH_H} rx={7} fill={TAPE} stroke={SHADOW} strokeWidth={2} />
+        <rect x={CH_X0} y={CH_Y} width={unlockedW} height={CH_H} rx={7} fill="url(#riso)" opacity={0.32} />
+        {heardW > 1 && (
+          <rect x={CH_X0} y={CH_Y} width={heardW} height={CH_H} rx={7} fill="url(#riso)" />
+        )}
+        {[1, 2, 4, 8].map((d) => (
+          <line
             key={d}
-            aria-hidden
-            className={`absolute inset-y-0 w-px ${
-              d <= limit ? "bg-accent/40" : "bg-paper/15"
-            }`}
-            style={{ left: `${(d / TOTAL) * 100}%` }}
+            x1={xForT(d)}
+            x2={xForT(d)}
+            y1={CH_Y - 3}
+            y2={CH_Y + CH_H + 3}
+            stroke={SHADOW}
+            strokeWidth={2.5}
+            strokeOpacity={d <= limit ? 0.9 : 0.35}
           />
         ))}
-      </div>
+        {playing && (
+          <g>
+            <line x1={xForT(head)} x2={xForT(head)} y1={CH_Y - 6} y2={CH_Y + CH_H + 6} stroke="#12C2E9" strokeWidth={2} />
+            <circle cx={xForT(head)} cy={CH_Y - 7} r={3.5} fill="#12C2E9" stroke={SHADOW} strokeWidth={1} />
+          </g>
+        )}
+      </svg>
 
-      <div className="mt-2 flex justify-between font-condensed text-xs uppercase tracking-wider text-smoke tabular-nums">
+      {/* Tape-counter readout */}
+      <div className="mt-2 flex justify-between font-mono text-xs uppercase tracking-wider text-smoke tabular-nums">
         <span>{head.toFixed(1)}s</span>
         <span>
           {limit}s unlocked{revealed ? "" : ` / ${TOTAL}`}
         </span>
       </div>
 
+      {/* Chunky deck button: thick black outline + hard printed shadow. */}
       <button
         onClick={playing ? stop : play}
-        className={`mt-4 mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-accent bg-accent text-ink text-3xl shadow-[0_0_14px_rgba(198,251,69,0.4)] hover:shadow-[0_0_24px_rgba(198,251,69,0.65)] transition-[box-shadow,border-color,color]${
+        className={`mt-3 mx-auto flex h-16 w-16 items-center justify-center rounded-full border-[3px] border-night bg-accent text-night text-2xl shadow-[3px_3px_0_#0E0B2A] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[4px_5px_0_#0E0B2A] active:translate-y-0 active:shadow-[2px_2px_0_#0E0B2A]${
           playing ? " play-pulse" : ""
         }`}
         aria-label={playing ? "Stop" : "Play"}

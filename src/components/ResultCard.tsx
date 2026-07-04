@@ -63,7 +63,7 @@ export default function ResultCard({ status, answer, attempts, puzzleNumber }: P
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <button
           onClick={share}
-          className="min-h-[52px] rounded-sm bg-sindoor px-6 py-3.5 text-base font-medium text-paper hover:opacity-90"
+          className="min-h-[52px] rounded-sm bg-sindoor px-6 py-3.5 text-base font-medium text-ink shadow-[3px_3px_0_#0E0B2A] hover:-translate-y-0.5 hover:shadow-[4px_5px_0_#0E0B2A] transition-[box-shadow,transform]"
         >
           {copied ? "Copied!" : "Share result"}
         </button>

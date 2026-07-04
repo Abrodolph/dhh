@@ -33,7 +33,7 @@ export default function Countdown() {
   return (
     <p className="text-center font-condensed text-xs uppercase tracking-wider text-smoke">
       Next puzzle in{" "}
-      <span className="text-accent tabular-nums">
+      <span className="font-mono text-accent tabular-nums">
         {hh}:{mm}:{ss}
       </span>
     </p>

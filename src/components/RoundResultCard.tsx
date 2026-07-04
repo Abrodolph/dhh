@@ -41,7 +41,7 @@ export default function RoundResultCard({
 
       {result ? (
         <>
-          <div className="mt-1 font-condensed text-5xl font-bold tabular-nums text-accent">
+          <div className="mt-1 font-mono text-5xl font-bold tabular-nums text-accent">
             {result.score.toLocaleString()}
           </div>
           <p className="text-sm text-smoke">
@@ -100,7 +100,7 @@ export default function RoundResultCard({
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <button
           onClick={onViewLeaderboard}
-          className="min-h-[52px] rounded-sm bg-accent px-6 py-3.5 text-base font-medium text-ink hover:opacity-90"
+          className="min-h-[52px] rounded-sm bg-accent px-6 py-3.5 text-base font-medium text-ink shadow-[3px_3px_0_#0E0B2A] hover:-translate-y-0.5 hover:shadow-[4px_5px_0_#0E0B2A] transition-[box-shadow,transform]"
         >
           View leaderboard
         </button>

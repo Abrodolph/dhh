@@ -325,8 +325,11 @@ export default function Home() {
 
   return (
     <>
-      <CollageBackground strength={0.14} />
-      <main className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col bg-ink/85 px-5 pb-16 pt-8 shadow-2xl shadow-black/50 backdrop-blur-sm md:border-x md:border-paper/10">
+      <CollageBackground strength={0.1} />
+      <main className="card-halftone relative z-10 mx-auto flex min-h-screen max-w-md flex-col bg-ink px-5 pb-12 pt-6 shadow-2xl shadow-black/40 md:border-x-2 md:border-night">
+      {/* Racing stripe: the cassette label's signature band, full-bleed across
+          the top of the card. */}
+      <div aria-hidden className="tape-stripes absolute inset-x-0 top-0 h-2.5" />
       {/* Practice is a secondary mode: reachable but off to the side, not a
           primary center tab like Daily / Compete. */}
       <button
@@ -354,16 +357,16 @@ export default function Home() {
         </button>
       </div>
       <header className="text-center">
-        <h1 className="mt-10 font-condensed text-5xl font-bold uppercase tracking-tight text-paper">DHH Heardle</h1>
+        <h1 className="mt-8 font-condensed text-4xl font-bold uppercase tracking-tight text-paper">DHH Heardle</h1>
         <p className="mt-1 font-condensed text-sm uppercase tracking-wide text-smoke">
           Guess the track from 1 second. {MAX_ATTEMPTS} attempts.
         </p>
-        <div className="mt-5 flex justify-center gap-3">
+        <div className="mt-4 flex justify-center gap-3">
           {(["daily", "round"] as Mode[]).map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`min-h-[56px] flex-1 rounded-sm border px-4 py-3.5 text-lg font-condensed uppercase tracking-wider ${
+              className={`min-h-[48px] flex-1 rounded-sm border px-4 py-3 text-lg font-condensed uppercase tracking-wider ${
                 mode === m
                   ? "border-accent text-accent"
                   : "border-paper/15 text-smoke hover:text-paper"
@@ -389,7 +392,7 @@ export default function Home() {
           <PracticeFilters artists={artists} prefs={prefs} onChange={updatePrefs} />
           <button
             onClick={() => void loadPuzzle("random", prefs)}
-            className="mt-3 min-h-[58px] w-full rounded-sm border border-accent py-4 text-lg font-condensed uppercase tracking-wider text-accent hover:bg-accent/10"
+            className="mt-3 min-h-[58px] w-full rounded-sm bg-accent py-4 text-lg font-condensed uppercase tracking-wider text-ink shadow-[3px_3px_0_#0E0B2A] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[4px_5px_0_#0E0B2A]"
           >
             New puzzle
           </button>
@@ -413,7 +416,7 @@ export default function Home() {
           </div>
           <button
             onClick={() => void startRound()}
-            className="mt-3 min-h-[58px] w-full rounded-sm border border-accent bg-accent/10 py-4 text-lg font-condensed uppercase tracking-wider text-accent hover:bg-accent/20"
+            className="mt-3 min-h-[58px] w-full rounded-sm bg-accent py-4 text-lg font-condensed uppercase tracking-wider text-ink shadow-[3px_3px_0_#0E0B2A] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[4px_5px_0_#0E0B2A]"
           >
             Start competing
           </button>
@@ -473,17 +476,17 @@ export default function Home() {
             </div>
           )}
 
-          <section className={inRoundGame ? "mt-4" : "mt-8"}>
+          <section className={inRoundGame ? "mt-4" : "mt-5"}>
             <Player clipUrl={puzzle.clipUrl} unlocked={unlocked} revealed={gameOver} />
           </section>
 
-          <section className="mt-8 flex flex-col gap-2">
+          <section className="mt-5 flex flex-col gap-1.5">
             {Array.from({ length: MAX_ATTEMPTS }).map((_, i) => (
               <AttemptRow key={i} index={i} result={attempts[i] ?? null} />
             ))}
           </section>
 
-          <section className="mt-6">
+          <section className="mt-5">
             {!gameOver ? (
               <GuessInput
                 songs={songs}
@@ -537,7 +540,7 @@ export default function Home() {
         <p className="mt-16 text-center text-smoke animate-pulse">Loading…</p>
       )}
 
-      <footer className="mt-auto pt-12 text-center text-xs text-smoke/60">
+      <footer className="mt-auto pt-8 text-center text-xs text-smoke/60">
         A fan project. All music belongs to the artists & labels — go stream the full songs.
       </footer>
       </main>

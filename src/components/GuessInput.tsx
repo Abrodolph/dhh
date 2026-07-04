@@ -75,7 +75,7 @@ export default function GuessInput({ songs, disabled, onGuess, onSkip, skipLabel
             }
           }}
           placeholder="Which song is it? Type to search…"
-          className="w-full min-h-[52px] rounded-sm border border-accent bg-ink px-4 py-3.5 text-base text-paper placeholder-smoke focus:border-accent focus:shadow-[0_0_12px_rgba(198,251,69,0.25)] disabled:opacity-40"
+          className="w-full min-h-[52px] rounded-sm border-2 border-paper/70 bg-ink px-4 py-3.5 text-base text-paper placeholder-smoke focus:border-accent focus:shadow-[3px_3px_0_rgba(18,194,233,0.4)] disabled:opacity-40"
           autoComplete="off"
           spellCheck={false}
           aria-label="Guess the song"
@@ -103,7 +103,7 @@ export default function GuessInput({ songs, disabled, onGuess, onSkip, skipLabel
       <button
         onClick={onSkip}
         disabled={disabled}
-        className="mt-3 min-h-[56px] w-full rounded-sm border border-paper/20 py-4 text-base text-smoke hover:border-smoke hover:text-paper transition-colors disabled:opacity-40"
+        className="mt-2.5 min-h-[48px] w-full rounded-sm border border-paper/20 py-3 text-base text-smoke hover:border-smoke hover:text-paper transition-colors disabled:opacity-40"
       >
         {skipLabel}
       </button>

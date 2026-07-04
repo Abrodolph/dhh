@@ -6,11 +6,11 @@
 //   3. only when speed ties does a harder song win (difficulty multiplier)
 //
 // The multiplier is capped so it can NEVER overturn a speed difference: the
-// tightest speed gap is 1000 vs 800 (25% apart), and max multiplier is 1.2,
-// so 800 * 1.2 = 960 < 1000 — a 1s-easy guess still beats a 2s-hard one.
+// tightest speed gap is 100 vs 80 (25% apart), and max multiplier is 1.2,
+// so 80 * 1.2 = 96 < 100 — a 1s-easy guess still beats a 2s-hard one.
 
 /** Points by attempt index (0 = guessed on the 1s clip … 4 = on the 16s clip). */
-export const SPEED_POINTS = [1000, 800, 600, 400, 200] as const;
+export const SPEED_POINTS = [100, 80, 60, 40, 20] as const;
 
 /** Difficulty multiplier keyed by the numeric `difficulty` column (1/2/3). */
 export const DIFFICULTY_MULTIPLIER: Record<number, number> = {

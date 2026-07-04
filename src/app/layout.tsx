@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Tiro_Devanagari_Hindi, Saira_Condensed } from "next/font/google";
+import { Archivo, Space_Mono, Tiro_Devanagari_Hindi, Saira_Condensed } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const grotesk = Space_Grotesk({
+// Print-era grotesque for body copy — closer to a cassette label than Space Grotesk.
+const body = Archivo({
   subsets: ["latin"],
-  variable: "--font-grotesk",
+  variable: "--font-body",
+});
+
+// Tape-counter digits: player timer, countdown, scores.
+const mono = Space_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-mono",
 });
 
 const devanagari = Tiro_Devanagari_Hindi({
@@ -49,7 +57,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${grotesk.variable} ${devanagari.variable} ${condensed.variable}`}>
+    <html lang="en" className={`${body.variable} ${mono.variable} ${devanagari.variable} ${condensed.variable}`}>
       <body className="bg-ink text-paper font-sans antialiased min-h-screen">
         {children}
         <Analytics />

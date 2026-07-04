@@ -6,13 +6,55 @@
   color-scheme: dark;
 }
 
-/* paper-grain texture, very subtle */
+/* Deep-indigo ground under a zine halftone: a big dot screen (riso cyan) over a
+   fine grain, on a two-stop indigo wash. The bg-ink class is the fallback. */
 body {
-  background-image: radial-gradient(
-    rgba(242, 241, 238, 0.035) 1px,
-    transparent 1px
+  background-image:
+    radial-gradient(rgba(18, 194, 233, 0.14) 1.6px, transparent 1.8px),
+    radial-gradient(rgba(255, 61, 165, 0.05) 1px, transparent 1.2px),
+    linear-gradient(180deg, #262357 0%, #1c1948 100%);
+  background-size:
+    11px 11px,
+    5px 5px,
+    100% 100%;
+  background-position:
+    0 0,
+    2px 3px,
+    0 0;
+  background-attachment: fixed;
+}
+
+/* Riso racing stripe — the theme's signature band: orange / hot-pink / cyan. */
+.tape-stripes {
+  background: linear-gradient(
+    to right,
+    #ff6a1a 0% 33.33%,
+    #ff3da5 33.33% 66.66%,
+    #12c2e9 66.66% 100%
   );
-  background-size: 5px 5px;
+}
+
+/* Poster-wall collage: screen over the dark indigo so it reads as a faint
+   printed light-leak instead of a photo overlay. */
+.collage-root {
+  mix-blend-mode: screen;
+}
+
+/* The label card carries the halftone too, so the zine texture reads on mobile
+   where the card fills the viewport and the body screen is hidden. */
+.card-halftone {
+  background-image: radial-gradient(rgba(244, 238, 221, 0.045) 1.4px, transparent 1.6px);
+  background-size: 11px 11px;
+}
+
+/* Cassette reels turn only while audio plays. */
+.reel-run {
+  animation: reel-spin 2.4s linear infinite;
+}
+@keyframes reel-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -29,7 +71,7 @@ body {
     animation: row-in 260ms ease-out both;
   }
   .play-pulse {
-    animation: play-pulse 1.6s ease-in-out infinite;
+    animation: play-pulse 1.4s ease-in-out infinite;
   }
 }
 @keyframes row-in {
@@ -42,17 +84,18 @@ body {
     transform: translateY(0);
   }
 }
+/* Deck-button pulse: the hard printed shadow breathes instead of a neon glow. */
 @keyframes play-pulse {
   0%,
   100% {
-    box-shadow: 0 0 12px rgba(198, 251, 69, 0.25);
+    box-shadow: 3px 3px 0 #0e0b2a;
   }
   50% {
-    box-shadow: 0 0 24px rgba(198, 251, 69, 0.55);
+    box-shadow: 5px 5px 0 #0e0b2a;
   }
 }
 
 :focus-visible {
-  outline: 2px solid #c6fb45;
+  outline: 2px solid #12c2e9;
   outline-offset: 2px;
 }

@@ -59,7 +59,7 @@ export default function UsernameField({ onSaved, startEditing }: Props) {
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && void save()}
         placeholder="Your leaderboard name"
-        className="min-h-[48px] flex-1 rounded-sm border border-accent bg-ink px-4 py-3 text-base text-paper placeholder-smoke focus:shadow-[0_0_12px_rgba(198,251,69,0.25)]"
+        className="min-h-[48px] flex-1 rounded-sm border-2 border-paper/70 bg-ink px-4 py-3 text-base text-paper placeholder-smoke focus:border-accent focus:shadow-[3px_3px_0_rgba(18,194,233,0.4)]"
         autoComplete="off"
         spellCheck={false}
         aria-label="Leaderboard name"
