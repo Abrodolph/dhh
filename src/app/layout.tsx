@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, Space_Mono, Tiro_Devanagari_Hindi, Saira_Condensed } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-
+import Script from "next/script";
 // Print-era grotesque for body copy — closer to a cassette label than Space Grotesk.
 const body = Archivo({
   subsets: ["latin"],
@@ -57,11 +57,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${body.variable} ${mono.variable} ${devanagari.variable} ${condensed.variable}`}>
-      <body className="bg-ink text-paper font-sans antialiased min-h-screen">
-        {children}
-        <Analytics />
-      </body>
-    </html>
-  );
+<html
+  lang="en"
+  className={`${body.variable} ${mono.variable} ${devanagari.variable} ${condensed.variable}`}
+>
+  <head>
+    <Script
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="269bff29-8e99-496d-87ff-90b953d670f9"
+    />
+  </head>
+
+  <body className="bg-ink text-paper font-sans antialiased min-h-screen">
+    {children}
+    <Analytics />
+  </body>
+</html>  );
 }
